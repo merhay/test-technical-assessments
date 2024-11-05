@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">application</string>
+    <string name="page_title">My BBC</string>
+    <string name="subtitle_text">This is a BBC app with all your favourite content</string>
+    <string name="error_message">Something has gone wrong</string>
+    <string name="breaking_news">Breaking News</string>
 </resources>
