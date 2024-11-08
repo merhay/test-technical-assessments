@@ -3,6 +3,7 @@
     <string name="page_title">My BBC</string>
     <string name="subtitle_text">This is a BBC app with all your favourite content</string>
     <string name="error_message">Something has gone wrong</string>
+    <string name="tv_license_message">Do you have a TV License ?</string>
     <string name="breaking_news">Breaking News</string>
     <string name="lorem_Placeholder_Text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent congue efficitur lorem, sed sagittis enim interdum quis. Donec in turpis commodo urna sagittis mattis nec at leo. Vestibulum elit enim, maximus a ante non, dignissim bibendum sapien. Aliquam non commodo metus. Suspendisse dignissim pulvinar mollis. Aliquam erat volutpat. Duis sollicitudin imperdiet elit, ut placerat diam blandit quis. Nunc hendrerit turpis vitae pulvinar fringilla. Ut at pretium sapien. Nullam cursus sodales ante ut ultricies.\\nUt felis libero, imperdiet a semper vel, sollicitudin sit amet massa. Duis sed rutrum dui. Aenean gravida quam ante, sit amet semper ipsum aliquam tempus. Integer vitae auctor mauris. Nulla tristique sed purus vel placerat. Vivamus laoreet sed enim at blandit. Fusce pharetra lorem vitae rutrum vulputate. Nulla nec nisi ut mi lacinia ornare blandit ac odio. faucibus ipsum egestas sit amet.\n" +
                     "\n" +

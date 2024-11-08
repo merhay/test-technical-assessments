@@ -1,7 +1,6 @@
 package uk.co.bbc.application
 
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,13 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,9 +31,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,10 +38,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,15 +49,11 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import uk.co.bbc.application.ui.theme.ApplicationTheme
 import java.time.LocalDateTime
 
@@ -73,17 +63,42 @@ class MainActivity : ComponentActivity() {
     private val uiState = MutableStateFlow<UiState>(UiState.HomePage(showDialog = false))
     private val onBreakingNewsClick = { uiState.value = UiState.HomePage(showDialog = true) }
     private val onHomeClick = { uiState.value = UiState.HomePage(showDialog = false) }
-    private val goToClicked = { uiState.value = UiState.ContentPage(showDialog = false) }
+    private val goToClicked = {title: String ->
+        if (title == "TV Guide") {
+            uiState.value = UiState.HomePage(
+                showDialog = false,
+                showTvLicenseDialog = true,
+                showLoader = false
+            )
+        } else {
+            uiState.value = UiState.ContentPage(showDialog = false)
+        }
+
+    }
+    private val onRefreshClick: () -> Unit = {
+        uiState.value = UiState.HomePage(showDialog = false, showLoader = true)
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(2000L)
+            uiState.value = UiState.HomePage(showDialog = false, showLoader = false)
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         setContent {
             ApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val uiState = uiState.collectAsState()
-                    DrawContent(uiState, innerPadding, onHomeClick, onBreakingNewsClick, goToClicked)
+                    DrawContent(
+                        uiState,
+                        innerPadding,
+                        onHomeClick,
+                        onBreakingNewsClick,
+                        goToClicked,
+                        onRefreshClick
+                    )
                 }
             }
         }
@@ -97,7 +112,8 @@ fun DrawContent(
     innerPadding: PaddingValues,
     onHomeClick: () -> Unit,
     onBreakingNewsClick: () -> Unit,
-    goToClicked: () -> Unit
+    goToClicked: (String) -> Unit,
+    onRefreshClick: () -> Unit
 ) {
     val currentTopic = rememberSaveable { mutableStateOf("Politics") }
     val itemPosition = rememberSaveable() { mutableStateOf(0) }
@@ -112,11 +128,18 @@ fun DrawContent(
                     currentTopic.value = topic
                     itemPosition.value = position},
                 title = currentTopic.value,
-                itemPosition = itemPosition.value
+                itemPosition = itemPosition.value,
+                onRefreshClick = onRefreshClick
             )
             if (newUiState.showDialog) {
                 AlertMessage(onHomeClick)
 
+            }
+            if (newUiState.showLoader) {
+                LoadingDialog()
+            }
+            if (newUiState.showTvLicenseDialog) {
+                TvLicenseAlertMessage(onHomeClick)
             }
         }
         is UiState.ContentPage -> {
@@ -129,7 +152,7 @@ fun DrawContent(
 }
 
 sealed interface UiState {
-    data class HomePage(val showDialog: Boolean) : UiState
+    data class HomePage(val showDialog: Boolean, val showTvLicenseDialog: Boolean = false, val showLoader: Boolean = false) : UiState
     data class ContentPage(val showDialog: Boolean): UiState
 }
 
@@ -137,7 +160,15 @@ sealed interface UiState {
 
 
 @Composable
-fun HomePage(modifier: Modifier = Modifier, onBreakingNewsClick: () -> Unit, goToClicked: () -> Unit, title: String, onDropdownItemClick: (String, Int)-> Unit, itemPosition: Int) {
+fun HomePage(
+    modifier: Modifier = Modifier,
+    onBreakingNewsClick: () -> Unit,
+    goToClicked: (String) -> Unit,
+    title: String,
+    onDropdownItemClick: (String, Int)-> Unit,
+    itemPosition: Int,
+    onRefreshClick: () -> Unit
+    ) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -162,7 +193,7 @@ fun HomePage(modifier: Modifier = Modifier, onBreakingNewsClick: () -> Unit, goT
                     fontSize = 35.sp,
                     modifier = Modifier.padding(horizontal = 30.dp)
                 )
-                LoadingButton()
+                LoadingButton(onRefreshClick)
             }
             Image(
                 painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
@@ -177,10 +208,10 @@ fun HomePage(modifier: Modifier = Modifier, onBreakingNewsClick: () -> Unit, goT
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text ="Go to ${title} ",
+                Text(text ="Go to $title ",
                     modifier = Modifier
-                        .padding(horizontal = 30.dp)
-                        .clickable { goToClicked() }
+                        .padding(horizontal = 16.dp)
+                        .clickable { goToClicked(title) }
                 )
                 PickerDropdownMenu(onClick = onDropdownItemClick,itemPosition)
             }
@@ -188,7 +219,6 @@ fun HomePage(modifier: Modifier = Modifier, onBreakingNewsClick: () -> Unit, goT
             Spacer(Modifier.padding(bottom = 150.dp))
             Footer(onBreakingNewsClick, modifier = Modifier
                 .padding(80.dp)
-
             )
         }
     }
@@ -217,35 +247,25 @@ fun ContentPage(modifier: Modifier = Modifier, onHomeClick: () -> Unit, title: S
 }
 
 @Composable
-fun LoadingButton() {
+fun LoadingButton(onRefreshClick: () -> Unit) {
     var isLoading = rememberSaveable { mutableStateOf(false) }
 
     Box(
 
     ) {
-        IconButton(
+        Icon(
+            imageVector = Icons.Filled.Refresh,
+            contentDescription = null,
+            tint = Color.Blue,
+            modifier = Modifier
+                .padding(horizontal = 25.dp)
+                .clickable {
+                    onRefreshClick()
 
-            colors = IconButtonDefaults
-                .iconButtonColors(Color.Blue),
-            onClick = {
-                isLoading.value = true
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(2000L)
-                    isLoading.value = false
                 }
-            }
+
         )
 
-        {
-            Icon(
-                imageVector = Icons.Default.Refresh,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(horizontal = 25.dp)
-                    .background(color = Color.Blue)
-
-            )
-        }
         if(isLoading.value) {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -260,7 +280,7 @@ fun LoadingButton() {
 
 @Composable
 fun Subheading(modifier: Modifier = Modifier) {
-    val currentDate = LocalDateTime.now()
+    val currentDate = LocalDateTime.now().toLocalDate()
 
     Text(
         text = "Last updated: $currentDate",
@@ -275,26 +295,28 @@ fun Subheading(modifier: Modifier = Modifier) {
 @Composable
 fun PickerDropdownMenu(onClick: (String, Int)-> Unit, itemPosition: Int) {
 
-    val dropdownExpanded = rememberSaveable() { mutableStateOf(false) }
+    val dropdownExpanded = rememberSaveable { mutableStateOf(false) }
     val topics = listOf("Politics", "UK", "Sport", "Technology", "World", "TV Guide")
 
 
-    Box(modifier = Modifier.fillMaxWidth()){
+    Box(
+        modifier = Modifier.padding(end = 16.dp)
+    ){
         Row(horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable { dropdownExpanded.value = true }
         ) {
-            Text(text= topics.get(itemPosition))
+            Text(text= topics[itemPosition])
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
         }
         DropdownMenu(
             expanded = dropdownExpanded.value,
             onDismissRequest = { dropdownExpanded.value = false }
         ) {
-            topics.forEachIndexed() {index, currentCategory ->
+            topics.forEachIndexed {index, currentCategory ->
                 DropdownMenuItem(
                     onClick = {
-                        onClick(topics.get(index),index)
+                        onClick(topics[index],index)
                       dropdownExpanded.value = false
                     },
                     text = { Text(text = currentCategory) }
@@ -308,23 +330,68 @@ fun PickerDropdownMenu(onClick: (String, Int)-> Unit, itemPosition: Int) {
 
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 fun AlertMessage(onHomeClick: () -> Unit) {
+
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = stringResource(R.string.error_message)) },
+        //text = { Text(text = "Jetpack Compose Alert Dialog") },
+        confirmButton = { // 6
+            Button(
+                onClick = onHomeClick
+            ) {
+                Text(
+                    text = "Confirm",
+                    color = Color.White
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun TvLicenseAlertMessage(onHomeClick: () -> Unit) {
+
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = stringResource(R.string.tv_license_message)) },
+        confirmButton = { // 6
+            Button(
+                onClick = onHomeClick
+            ) {
+                Text(
+                    text = "Yes",
+                    color = Color.White
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onHomeClick
+            ) {
+                Text(
+                    text = "No",
+                    color = Color.White
+                )
+            }
+        }
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun LoadingDialog() {
 
     BasicAlertDialog(
         onDismissRequest = { },
     ) {
         Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(12.dp)
-                .background(color = Color.Yellow)
         ) {
-            Text(text = stringResource(R.string.error_message))
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = onHomeClick
-
-            ) { Text("Close") }
+            CircularProgressIndicator()
         }
     }
 }
@@ -341,12 +408,33 @@ fun Footer(onBreakingNewsClick: () -> Unit, modifier: Modifier) {
 }
 
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ApplicationTheme {
-        HomePage(onBreakingNewsClick = { }, goToClicked = {}, title = "", onDropdownItemClick = {_,_ ->}, itemPosition = 1)
+        HomePage(
+            onBreakingNewsClick = { },
+            goToClicked = {},
+            title = "Politics",
+            onDropdownItemClick = { _, _ -> },
+            itemPosition = 1,
+            onRefreshClick = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AlertMessagePreview() {
+    ApplicationTheme {
+        AlertMessage {  }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TvLicenseAlertMessagePreview() {
+    ApplicationTheme {
+        TvLicenseAlertMessage {  }
     }
 }
