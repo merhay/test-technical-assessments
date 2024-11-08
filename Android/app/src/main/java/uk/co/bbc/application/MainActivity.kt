@@ -58,7 +58,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.bbc.application.ui.theme.ApplicationTheme
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.Date
 
 
@@ -281,11 +280,7 @@ fun ContentPage(modifier: Modifier = Modifier, onHomeClick: () -> Unit, title: S
 
 @Composable
 fun LoadingButton(onRefreshClick: () -> Unit) {
-    var isLoading = rememberSaveable { mutableStateOf(false) }
-
-    Box(
-
-    ) {
+    Box {
         Icon(
             imageVector = Icons.Filled.Refresh,
             contentDescription = null,
@@ -294,19 +289,8 @@ fun LoadingButton(onRefreshClick: () -> Unit) {
                 .padding(horizontal = 25.dp)
                 .clickable {
                     onRefreshClick()
-
                 }
-
         )
-
-        if (isLoading.value) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .background(color = Color.Yellow)
-
-            )
-        }
     }
 }
 
