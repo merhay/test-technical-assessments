@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -55,7 +57,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.bbc.application.ui.theme.ApplicationTheme
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
+import java.util.Date
 
 
 class MainActivity : ComponentActivity() {
@@ -63,7 +67,7 @@ class MainActivity : ComponentActivity() {
     private val uiState = MutableStateFlow<UiState>(UiState.HomePage(showDialog = false))
     private val onBreakingNewsClick = { uiState.value = UiState.HomePage(showDialog = true) }
     private val onHomeClick = { uiState.value = UiState.HomePage(showDialog = false) }
-    private val goToClicked = {title: String ->
+    private val goToClicked = { title: String ->
         if (title == "TV Guide") {
             uiState.value = UiState.HomePage(
                 showDialog = false,
@@ -124,9 +128,10 @@ fun DrawContent(
                 modifier = Modifier.padding(innerPadding),
                 onBreakingNewsClick,
                 goToClicked,
-                onDropdownItemClick = { topic,position ->
+                onDropdownItemClick = { topic, position ->
                     currentTopic.value = topic
-                    itemPosition.value = position},
+                    itemPosition.value = position
+                },
                 title = currentTopic.value,
                 itemPosition = itemPosition.value,
                 onRefreshClick = onRefreshClick
@@ -142,6 +147,7 @@ fun DrawContent(
                 TvLicenseAlertMessage(onHomeClick)
             }
         }
+
         is UiState.ContentPage -> {
             ContentPage(
                 onHomeClick = onHomeClick,
@@ -152,11 +158,14 @@ fun DrawContent(
 }
 
 sealed interface UiState {
-    data class HomePage(val showDialog: Boolean, val showTvLicenseDialog: Boolean = false, val showLoader: Boolean = false) : UiState
-    data class ContentPage(val showDialog: Boolean): UiState
+    data class HomePage(
+        val showDialog: Boolean,
+        val showTvLicenseDialog: Boolean = false,
+        val showLoader: Boolean = false
+    ) : UiState
+
+    data class ContentPage(val showDialog: Boolean) : UiState
 }
-
-
 
 
 @Composable
@@ -165,10 +174,12 @@ fun HomePage(
     onBreakingNewsClick: () -> Unit,
     goToClicked: (String) -> Unit,
     title: String,
-    onDropdownItemClick: (String, Int)-> Unit,
+    onDropdownItemClick: (String, Int) -> Unit,
     itemPosition: Int,
     onRefreshClick: () -> Unit
-    ) {
+) {
+
+    val currentDateAndTime = rememberSaveable { mutableStateOf(Date()) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -193,7 +204,10 @@ fun HomePage(
                     fontSize = 35.sp,
                     modifier = Modifier.padding(horizontal = 30.dp)
                 )
-                LoadingButton(onRefreshClick)
+                LoadingButton({
+                    onRefreshClick()
+                    currentDateAndTime.value = Date()
+                })
             }
             Image(
                 painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
@@ -202,23 +216,25 @@ fun HomePage(
                     .fillMaxWidth()
                     .size(350.dp)
             )
-            Subheading()
+            Subheading(currentDateAndTime.value)
             Spacer(Modifier.padding(bottom = 15.dp))
-            Row(modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text ="Go to $title ",
+                Text(text = "Go to $title ",
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .clickable { goToClicked(title) }
                 )
-                PickerDropdownMenu(onClick = onDropdownItemClick,itemPosition)
+                PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
             }
 
             Spacer(Modifier.padding(bottom = 150.dp))
-            Footer(onBreakingNewsClick, modifier = Modifier
-                .padding(80.dp)
+            Footer(
+                onBreakingNewsClick, modifier = Modifier
+                    .padding(80.dp)
             )
         }
     }
@@ -227,21 +243,38 @@ fun HomePage(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContentPage(modifier: Modifier = Modifier, onHomeClick: () -> Unit, title: String) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(15.dp)) {
-        Column(    modifier = Modifier.fillMaxSize(),
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(15.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top) {
-            TopAppBar(title = {Text(text = title)}, navigationIcon = {
+            verticalArrangement = Arrangement.Top
+        ) {
+            TopAppBar(title = { Text(text = title) }, navigationIcon = {
                 IconButton(onClick = { onHomeClick() }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(64.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             })
-            Spacer(modifier = Modifier.padding(bottom = 30.dp))
-            Text(text = title)
-            Spacer(modifier = Modifier.padding(bottom = 30.dp))
-            Text(text = stringResource(R.string.lorem_Placeholder_Text))
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .weight(weight = 1f, fill = false),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.padding(bottom = 30.dp))
+                Text(text = title)
+                Spacer(modifier = Modifier.padding(bottom = 30.dp))
+                Text(text = stringResource(R.string.lorem_Placeholder_Text))
+            }
+
         }
     }
 }
@@ -266,7 +299,7 @@ fun LoadingButton(onRefreshClick: () -> Unit) {
 
         )
 
-        if(isLoading.value) {
+        if (isLoading.value) {
             CircularProgressIndicator(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -279,11 +312,15 @@ fun LoadingButton(onRefreshClick: () -> Unit) {
 
 
 @Composable
-fun Subheading(modifier: Modifier = Modifier) {
-    val currentDate = LocalDateTime.now().toLocalDate()
+fun Subheading(currentTime: Date) {
+    val dayFormat = SimpleDateFormat("dd MMM yyyy")
+    val timeFormat = SimpleDateFormat("hh:mm:ss")
+    val day = dayFormat.format(currentTime)
+    val time = timeFormat.format(currentTime)
+
 
     Text(
-        text = "Last updated: $currentDate",
+        text = "Last updated: $day at $time",
         modifier = Modifier.padding(bottom = 10.dp)
     )
     Text(
@@ -293,7 +330,7 @@ fun Subheading(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PickerDropdownMenu(onClick: (String, Int)-> Unit, itemPosition: Int) {
+fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
 
     val dropdownExpanded = rememberSaveable { mutableStateOf(false) }
     val topics = listOf("Politics", "UK", "Sport", "Technology", "World", "TV Guide")
@@ -301,23 +338,23 @@ fun PickerDropdownMenu(onClick: (String, Int)-> Unit, itemPosition: Int) {
 
     Box(
         modifier = Modifier.padding(end = 16.dp)
-    ){
+    ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable { dropdownExpanded.value = true }
         ) {
-            Text(text= topics[itemPosition])
+            Text(text = topics[itemPosition])
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
         }
         DropdownMenu(
             expanded = dropdownExpanded.value,
             onDismissRequest = { dropdownExpanded.value = false }
         ) {
-            topics.forEachIndexed {index, currentCategory ->
+            topics.forEachIndexed { index, currentCategory ->
                 DropdownMenuItem(
                     onClick = {
-                        onClick(topics[index],index)
-                      dropdownExpanded.value = false
+                        onClick(topics[index], index)
+                        dropdownExpanded.value = false
                     },
                     text = { Text(text = currentCategory) }
                 )
@@ -328,14 +365,12 @@ fun PickerDropdownMenu(onClick: (String, Int)-> Unit, itemPosition: Int) {
 }
 
 
-
 @Composable
 fun AlertMessage(onHomeClick: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = { },
         title = { Text(text = stringResource(R.string.error_message)) },
-        //text = { Text(text = "Jetpack Compose Alert Dialog") },
         confirmButton = { // 6
             Button(
                 onClick = onHomeClick
@@ -427,7 +462,7 @@ fun GreetingPreview() {
 @Composable
 fun AlertMessagePreview() {
     ApplicationTheme {
-        AlertMessage {  }
+        AlertMessage { }
     }
 }
 
@@ -435,6 +470,17 @@ fun AlertMessagePreview() {
 @Composable
 fun TvLicenseAlertMessagePreview() {
     ApplicationTheme {
-        TvLicenseAlertMessage {  }
+        TvLicenseAlertMessage { }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ContentPagePreview() {
+    ApplicationTheme {
+        ContentPage(
+            title = "Politics",
+            onHomeClick = { }
+        )
     }
 }
