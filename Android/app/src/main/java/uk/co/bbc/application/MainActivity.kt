@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,6 +77,9 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+    private val onYesClick = {
+        uiState.value = UiState.ContentPage(showDialog = false)
+    }
     private val onRefreshClick: () -> Unit = {
         uiState.value = UiState.HomePage(showDialog = false, showLoader = true)
         CoroutineScope(Dispatchers.Main).launch {
@@ -100,7 +102,8 @@ class MainActivity : ComponentActivity() {
                         onHomeClick,
                         onBreakingNewsClick,
                         goToClicked,
-                        onRefreshClick
+                        onRefreshClick,
+                        onYesClick
                     )
                 }
             }
@@ -116,7 +119,8 @@ fun DrawContent(
     onHomeClick: () -> Unit,
     onBreakingNewsClick: () -> Unit,
     goToClicked: (String) -> Unit,
-    onRefreshClick: () -> Unit
+    onRefreshClick: () -> Unit,
+    onConfirmClick: () -> Unit
 ) {
     val currentTopic = rememberSaveable { mutableStateOf("Politics") }
     val itemPosition = rememberSaveable() { mutableStateOf(0) }
@@ -143,7 +147,7 @@ fun DrawContent(
                 LoadingDialog()
             }
             if (newUiState.showTvLicenseDialog) {
-                TvLicenseAlertMessage(onHomeClick)
+                TvLicenseAlertMessage(onHomeClick, onConfirmClick = onConfirmClick)
             }
         }
 
@@ -369,14 +373,14 @@ fun AlertMessage(onHomeClick: () -> Unit) {
 }
 
 @Composable
-fun TvLicenseAlertMessage(onHomeClick: () -> Unit) {
+fun TvLicenseAlertMessage(onHomeClick: () -> Unit, onConfirmClick: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = { },
         title = { Text(text = stringResource(R.string.tv_license_message)) },
         confirmButton = { // 6
             Button(
-                onClick = onHomeClick
+                onClick = onConfirmClick
             ) {
                 Text(
                     text = "Yes",
@@ -454,7 +458,7 @@ fun AlertMessagePreview() {
 @Composable
 fun TvLicenseAlertMessagePreview() {
     ApplicationTheme {
-        TvLicenseAlertMessage { }
+        TvLicenseAlertMessage({ }) { }
     }
 }
 
