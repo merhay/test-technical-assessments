@@ -15,7 +15,7 @@ fun AlertMessage(onHomeClick: () -> Unit) {
     AlertDialog(
         onDismissRequest = { },
         title = { Text(text = stringResource(R.string.error_message)) },
-        confirmButton = { // 6
+        confirmButton = {
             Button(
                 onClick = onHomeClick
             ) {
@@ -34,7 +34,7 @@ fun TvLicenseAlertMessage(onHomeClick: () -> Unit, onConfirmClick: () -> Unit) {
     AlertDialog(
         onDismissRequest = { },
         title = { Text(text = stringResource(R.string.tv_license_message)) },
-        confirmButton = { // 6
+        confirmButton = {
             Button(
                 onClick = onConfirmClick
             ) {
