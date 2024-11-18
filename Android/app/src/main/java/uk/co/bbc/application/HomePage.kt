@@ -45,7 +45,9 @@ const val TEST_TAG_REFRESH_BUTTON = "refresh button"
 const val TEST_TAG_DROPDOWN_MENU = "dropdown menu"
 const val TEST_TAG_DROPDOWN_MENU_ITEM = "dropdown menu item"
 const val TEST_TAG_BREAKING_NEWS_BUTTON = "breaking news button"
-const val TEST_TAG_LOADING_SPINNER = "test tag loading spinner"
+const val TEST_TAG_LOADING_SPINNER = "loading spinner"
+const val TEST_TAG_LAST_UPDATED = "last updated"
+const val TEST_TAG_GO_TO_BUTTON = "go to button"
 
 @Composable
 fun HomePage(
@@ -105,6 +107,7 @@ fun HomePage(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .clickable { goToClicked(title) }
+                        .testTag(TEST_TAG_GO_TO_BUTTON)
                 )
                 PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
             }
@@ -128,6 +131,7 @@ fun Subheading(currentTime: Date) {
     Text(
         text = "Last updated: $day at $time",
         modifier = Modifier.padding(bottom = 10.dp)
+            .testTag(TEST_TAG_LAST_UPDATED)
     )
     Text(
         text = stringResource(R.string.subtitle_text),
