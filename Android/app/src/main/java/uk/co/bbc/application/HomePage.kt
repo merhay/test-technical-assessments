@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -39,6 +40,9 @@ import androidx.compose.ui.unit.sp
 import uk.co.bbc.application.ui.theme.ApplicationTheme
 import java.text.SimpleDateFormat
 import java.util.Date
+
+const val TEST_TAG_REFRESH_BUTTON = "Refresh Button"
+const val TEST_TAG_DROPDOWN_MENU = "Dropdown Menu"
 
 @Composable
 fun HomePage(
@@ -133,6 +137,7 @@ fun Subheading(currentTime: Date) {
 @Composable
 fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
 
+
     val dropdownExpanded = rememberSaveable { mutableStateOf(false) }
     val topics = listOf("Politics", "UK", "Sport", "Technology", "World", "TV Guide")
 
@@ -148,6 +153,7 @@ fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
         }
         DropdownMenu(
+            modifier = Modifier.testTag(TEST_TAG_DROPDOWN_MENU),
             expanded = dropdownExpanded.value,
             onDismissRequest = { dropdownExpanded.value = false }
         ) {
@@ -202,6 +208,7 @@ fun RefreshButton(onRefreshClick: () -> Unit) {
             contentDescription = null,
             tint = Color.Blue,
             modifier = Modifier
+                .testTag(TEST_TAG_REFRESH_BUTTON)
                 .padding(horizontal = 25.dp)
                 .clickable {
                     onRefreshClick()
