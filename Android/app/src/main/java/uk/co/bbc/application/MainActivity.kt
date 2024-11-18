@@ -85,7 +85,7 @@ fun DrawContent(
     onConfirmClick: () -> Unit
 ) {
     val currentTopic = rememberSaveable { mutableStateOf("Politics") }
-    val itemPosition = rememberSaveable() { mutableStateOf(0) }
+    val itemPosition = rememberSaveable { mutableStateOf(0) }
     val newUiState = uiState.value
     when (newUiState) {
         is UiState.HomePage -> {

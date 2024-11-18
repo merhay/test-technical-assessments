@@ -41,8 +41,11 @@ import uk.co.bbc.application.ui.theme.ApplicationTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 
-const val TEST_TAG_REFRESH_BUTTON = "Refresh Button"
-const val TEST_TAG_DROPDOWN_MENU = "Dropdown Menu"
+const val TEST_TAG_REFRESH_BUTTON = "refresh button"
+const val TEST_TAG_DROPDOWN_MENU = "dropdown menu"
+const val TEST_TAG_DROPDOWN_MENU_ITEM = "dropdown menu item"
+const val TEST_TAG_BREAKING_NEWS_BUTTON = "breaking news button"
+const val TEST_TAG_LOADING_SPINNER = "test tag loading spinner"
 
 @Composable
 fun HomePage(
@@ -159,6 +162,7 @@ fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
         ) {
             topics.forEachIndexed { index, currentCategory ->
                 DropdownMenuItem(
+                    modifier = Modifier.testTag(TEST_TAG_DROPDOWN_MENU_ITEM),
                     onClick = {
                         onClick(topics[index], index)
                         dropdownExpanded.value = false
@@ -179,10 +183,10 @@ fun LoadingDialog() {
         onDismissRequest = { },
     ) {
         Column(
+            modifier = Modifier.testTag(TEST_TAG_LOADING_SPINNER)
+                .padding(12.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(12.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularProgressIndicator()
         }
@@ -193,6 +197,7 @@ fun LoadingDialog() {
 fun Footer(onBreakingNewsClick: () -> Unit, modifier: Modifier) {
 
     Button(
+        modifier = Modifier.testTag(TEST_TAG_BREAKING_NEWS_BUTTON),
         onClick = onBreakingNewsClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
     ) {

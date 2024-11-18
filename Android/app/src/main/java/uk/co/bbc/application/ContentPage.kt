@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uk.co.bbc.application.ui.theme.ApplicationTheme
 
-const val TEST_TAG_BACK_BUTTON = "Back Button"
+const val TEST_TAG_BACK_BUTTON = "back button"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
