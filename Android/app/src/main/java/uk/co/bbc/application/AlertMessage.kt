@@ -4,10 +4,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.bbc.application.ui.theme.ApplicationTheme
+
+const val TEST_TAG_ALERT_CONFIRM_BUTTON = "alert confirm"
 
 @Composable
 fun AlertMessage(onHomeClick: () -> Unit) {
@@ -17,6 +21,7 @@ fun AlertMessage(onHomeClick: () -> Unit) {
         title = { Text(text = stringResource(R.string.error_message)) },
         confirmButton = {
             Button(
+                modifier = Modifier.testTag(TEST_TAG_ALERT_CONFIRM_BUTTON),
                 onClick = onHomeClick
             ) {
                 Text(

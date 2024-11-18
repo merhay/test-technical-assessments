@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -40,9 +43,16 @@ import uk.co.bbc.application.ui.theme.ApplicationTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 
+const val TEST_TAG_REFRESH_BUTTON = "refresh button"
+const val TEST_TAG_DROPDOWN_MENU = "dropdown menu"
+const val TEST_TAG_DROPDOWN_MENU_ITEM = "dropdown menu item"
+const val TEST_TAG_BREAKING_NEWS_BUTTON = "breaking news button"
+const val TEST_TAG_LOADING_SPINNER = "loading spinner"
+const val TEST_TAG_LAST_UPDATED = "last updated"
+const val TEST_TAG_GO_TO_BUTTON = "go to button"
+
 @Composable
 fun HomePage(
-    modifier: Modifier = Modifier,
     onBreakingNewsClick: () -> Unit,
     goToClicked: (String) -> Unit,
     title: String,
@@ -53,63 +63,64 @@ fun HomePage(
 
     val currentDateAndTime = rememberSaveable { mutableStateOf(Date()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.bbc_logo),
+            contentDescription = "BBC Logo",
+            modifier = Modifier
+                .padding(top = 20.dp)
+        )
+        Spacer(Modifier.padding(bottom = 50.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                imageVector = ImageVector.vectorResource(R.drawable.bbc_logo),
-                contentDescription = "BBC Logo",
-                modifier = Modifier
-                    .padding(top = 20.dp)
+            Text(
+                text = stringResource(R.string.page_title),
+                fontSize = 35.sp,
+                modifier = Modifier.padding(horizontal = 30.dp)
             )
-            Spacer(Modifier.padding(bottom = 50.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.page_title),
-                    fontSize = 35.sp,
-                    modifier = Modifier.padding(horizontal = 30.dp)
-                )
-                RefreshButton({
-                    onRefreshClick()
-                    currentDateAndTime.value = Date()
-                })
-            }
-            Image(
-                painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
-                contentDescription = "BBC Logo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(350.dp)
-            )
-            Subheading(currentDateAndTime.value)
-            Spacer(Modifier.padding(bottom = 15.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Go to $title ",
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable { goToClicked(title) }
-                )
-                PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
-            }
-
-            Spacer(Modifier.padding(bottom = 150.dp))
-            Footer(
-                onBreakingNewsClick, modifier = Modifier
-                    .padding(80.dp)
-            )
+            RefreshButton({
+                onRefreshClick()
+                currentDateAndTime.value = Date()
+            })
         }
+        Image(
+            painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
+            contentDescription = "BBC Logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(250.dp)
+        )
+        Subheading(currentDateAndTime.value)
+        Spacer(Modifier.padding(bottom = 15.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Go to $title ",
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clickable { goToClicked(title) }
+                    .testTag(TEST_TAG_GO_TO_BUTTON)
+            )
+            PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
+        }
+
+        Spacer(Modifier.padding(bottom = 30.dp))
+        Footer(
+            onBreakingNewsClick
+        )
     }
+
 }
 
 @Composable
@@ -122,7 +133,9 @@ fun Subheading(currentTime: Date) {
 
     Text(
         text = "Last updated: $day at $time",
-        modifier = Modifier.padding(bottom = 10.dp)
+        modifier = Modifier
+            .padding(bottom = 10.dp)
+            .testTag(TEST_TAG_LAST_UPDATED)
     )
     Text(
         text = stringResource(R.string.subtitle_text),
@@ -132,6 +145,7 @@ fun Subheading(currentTime: Date) {
 
 @Composable
 fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
+
 
     val dropdownExpanded = rememberSaveable { mutableStateOf(false) }
     val topics = listOf("Politics", "UK", "Sport", "Technology", "World", "TV Guide")
@@ -148,11 +162,13 @@ fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
         }
         DropdownMenu(
+            modifier = Modifier.testTag(TEST_TAG_DROPDOWN_MENU),
             expanded = dropdownExpanded.value,
             onDismissRequest = { dropdownExpanded.value = false }
         ) {
             topics.forEachIndexed { index, currentCategory ->
                 DropdownMenuItem(
+                    modifier = Modifier.testTag(TEST_TAG_DROPDOWN_MENU_ITEM),
                     onClick = {
                         onClick(topics[index], index)
                         dropdownExpanded.value = false
@@ -173,10 +189,11 @@ fun LoadingDialog() {
         onDismissRequest = { },
     ) {
         Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(12.dp)
+                .testTag(TEST_TAG_LOADING_SPINNER)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CircularProgressIndicator()
         }
@@ -184,9 +201,10 @@ fun LoadingDialog() {
 }
 
 @Composable
-fun Footer(onBreakingNewsClick: () -> Unit, modifier: Modifier) {
+fun Footer(onBreakingNewsClick: () -> Unit) {
 
     Button(
+        modifier = Modifier.testTag(TEST_TAG_BREAKING_NEWS_BUTTON),
         onClick = onBreakingNewsClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
     ) {
@@ -202,6 +220,7 @@ fun RefreshButton(onRefreshClick: () -> Unit) {
             contentDescription = null,
             tint = Color.Blue,
             modifier = Modifier
+                .testTag(TEST_TAG_REFRESH_BUTTON)
                 .padding(horizontal = 25.dp)
                 .clickable {
                     onRefreshClick()

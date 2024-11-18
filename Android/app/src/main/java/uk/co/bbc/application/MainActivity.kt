@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -85,19 +84,18 @@ fun DrawContent(
     onConfirmClick: () -> Unit
 ) {
     val currentTopic = rememberSaveable { mutableStateOf("Politics") }
-    val itemPosition = rememberSaveable() { mutableStateOf(0) }
+    val itemPosition = rememberSaveable { mutableStateOf(0) }
     val newUiState = uiState.value
     when (newUiState) {
         is UiState.HomePage -> {
             HomePage(
-                modifier = Modifier.padding(innerPadding),
                 onBreakingNewsClick,
                 goToClicked,
+                title = currentTopic.value,
                 onDropdownItemClick = { topic, position ->
                     currentTopic.value = topic
                     itemPosition.value = position
                 },
-                title = currentTopic.value,
                 itemPosition = itemPosition.value,
                 onRefreshClick = onRefreshClick
             )
