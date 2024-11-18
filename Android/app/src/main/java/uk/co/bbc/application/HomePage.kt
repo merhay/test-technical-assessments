@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Refresh
@@ -61,63 +63,64 @@ fun HomePage(
 
     val currentDateAndTime = rememberSaveable { mutableStateOf(Date()) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.bbc_logo),
+            contentDescription = "BBC Logo",
+            modifier = Modifier
+                .padding(top = 20.dp)
+        )
+        Spacer(Modifier.padding(bottom = 50.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                imageVector = ImageVector.vectorResource(R.drawable.bbc_logo),
-                contentDescription = "BBC Logo",
-                modifier = Modifier
-                    .padding(top = 20.dp)
+            Text(
+                text = stringResource(R.string.page_title),
+                fontSize = 35.sp,
+                modifier = Modifier.padding(horizontal = 30.dp)
             )
-            Spacer(Modifier.padding(bottom = 50.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.page_title),
-                    fontSize = 35.sp,
-                    modifier = Modifier.padding(horizontal = 30.dp)
-                )
-                RefreshButton({
-                    onRefreshClick()
-                    currentDateAndTime.value = Date()
-                })
-            }
-            Image(
-                painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
-                contentDescription = "BBC Logo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(350.dp)
-            )
-            Subheading(currentDateAndTime.value)
-            Spacer(Modifier.padding(bottom = 15.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Go to $title ",
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable { goToClicked(title) }
-                        .testTag(TEST_TAG_GO_TO_BUTTON)
-                )
-                PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
-            }
-
-            Spacer(Modifier.padding(bottom = 150.dp))
-            Footer(
-                onBreakingNewsClick
-            )
+            RefreshButton({
+                onRefreshClick()
+                currentDateAndTime.value = Date()
+            })
         }
+        Image(
+            painter = painterResource(R.mipmap.bbc_broadcasting_house_foreground),
+            contentDescription = "BBC Logo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .size(250.dp)
+        )
+        Subheading(currentDateAndTime.value)
+        Spacer(Modifier.padding(bottom = 15.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Go to $title ",
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clickable { goToClicked(title) }
+                    .testTag(TEST_TAG_GO_TO_BUTTON)
+            )
+            PickerDropdownMenu(onClick = onDropdownItemClick, itemPosition)
+        }
+
+        Spacer(Modifier.padding(bottom = 30.dp))
+        Footer(
+            onBreakingNewsClick
+        )
     }
+
 }
 
 @Composable
@@ -130,7 +133,8 @@ fun Subheading(currentTime: Date) {
 
     Text(
         text = "Last updated: $day at $time",
-        modifier = Modifier.padding(bottom = 10.dp)
+        modifier = Modifier
+            .padding(bottom = 10.dp)
             .testTag(TEST_TAG_LAST_UPDATED)
     )
     Text(
@@ -185,7 +189,8 @@ fun LoadingDialog() {
         onDismissRequest = { },
     ) {
         Column(
-            modifier = Modifier.testTag(TEST_TAG_LOADING_SPINNER)
+            modifier = Modifier
+                .testTag(TEST_TAG_LOADING_SPINNER)
                 .padding(12.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

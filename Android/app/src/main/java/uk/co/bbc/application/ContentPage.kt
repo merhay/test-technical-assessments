@@ -60,6 +60,7 @@ fun ContentPage(onHomeClick: () -> Unit, title: String) {
                 Text(text = title)
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
                 Text(text = stringResource(R.string.lorem_Placeholder_Text))
+                Spacer(modifier = Modifier.padding(bottom = 30.dp))
             }
 
         }
