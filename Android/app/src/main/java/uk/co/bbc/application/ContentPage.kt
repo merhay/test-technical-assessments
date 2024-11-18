@@ -29,7 +29,7 @@ const val TEST_TAG_BACK_BUTTON = "back button"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContentPage(modifier: Modifier = Modifier, onHomeClick: () -> Unit, title: String) {
+fun ContentPage(onHomeClick: () -> Unit, title: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,8 +71,8 @@ fun ContentPage(modifier: Modifier = Modifier, onHomeClick: () -> Unit, title: S
 fun ContentPagePreview() {
     ApplicationTheme {
         ContentPage(
-            title = "Politics",
-            onHomeClick = { }
+            onHomeClick = { },
+            title = "Politics"
         )
     }
 }

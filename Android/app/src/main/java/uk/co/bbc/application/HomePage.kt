@@ -49,7 +49,6 @@ const val TEST_TAG_LOADING_SPINNER = "test tag loading spinner"
 
 @Composable
 fun HomePage(
-    modifier: Modifier = Modifier,
     onBreakingNewsClick: () -> Unit,
     goToClicked: (String) -> Unit,
     title: String,
@@ -112,8 +111,7 @@ fun HomePage(
 
             Spacer(Modifier.padding(bottom = 150.dp))
             Footer(
-                onBreakingNewsClick, modifier = Modifier
-                    .padding(80.dp)
+                onBreakingNewsClick
             )
         }
     }
@@ -194,7 +192,7 @@ fun LoadingDialog() {
 }
 
 @Composable
-fun Footer(onBreakingNewsClick: () -> Unit, modifier: Modifier) {
+fun Footer(onBreakingNewsClick: () -> Unit) {
 
     Button(
         modifier = Modifier.testTag(TEST_TAG_BREAKING_NEWS_BUTTON),
