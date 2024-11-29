@@ -8,6 +8,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.Before
 import uk.co.bbc.application.support.HomepageHelper
+import uk.co.bbc.application.support.HomepageHelper.getLastUpdatedText
 
 @RunWith(AndroidJUnit4::class)
 class HomepageTest {
@@ -33,9 +34,13 @@ class HomepageTest {
     }
 
     @Test
-    fun testRefreshButtonUpdatesSuccessfully() {
+    fun testRefreshLastUpdatedSuccessfully() {
         mainActivityScenario.use {
+            val oldLastUpdated = getLastUpdatedText(composeTestRule)
             HomepageHelper.clickRefreshButton(composeTestRule)
+            HomepageHelper.waitUntilLoadingSpinnerCompletes(composeTestRule)
+            val newLastUpdated = getLastUpdatedText(composeTestRule)
+            HomepageHelper.verifyRefreshLastUpdated(oldLastUpdated, newLastUpdated)
         }
     }
 }

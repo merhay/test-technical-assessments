@@ -52,23 +52,22 @@ object HomepageHelper {
     }
 
     fun clickRefreshButton(composeTestRule: ComposeTestRule) {
-        val oldLastUpdated = getLastUpdatedText(composeTestRule)
-
         runBlocking { delay(1000) }
-
         ComposeActions.performClick(composeTestRule, TEST_TAG_REFRESH_BUTTON)
         ComposeAssertions.isDisplayed(composeTestRule,TEST_TAG_LOADING_SPINNER)
         composeTestRule.waitForIdle()
-        composeTestRule.waitUntil(3000) {
-                composeTestRule.onAllNodesWithTag(TEST_TAG_LOADING_SPINNER).fetchSemanticsNodes().isEmpty()
-        }
-        ComposeAssertions.isNotDisplayed(composeTestRule, TEST_TAG_LOADING_SPINNER)
+    }
 
-        val newLastUpdated = getLastUpdatedText(composeTestRule)
-
+    fun verifyRefreshLastUpdated(oldLastUpdated: String, newLastUpdated: String) {
         ComposeAssertions.isDateUpdated(oldLastUpdated, newLastUpdated)
     }
 
+    fun waitUntilLoadingSpinnerCompletes(composeTestRule: ComposeTestRule){
+        composeTestRule.waitUntil(3000) {
+            composeTestRule.onAllNodesWithTag(TEST_TAG_LOADING_SPINNER).fetchSemanticsNodes().isEmpty()
+        }
+        ComposeAssertions.isNotDisplayed(composeTestRule, TEST_TAG_LOADING_SPINNER)
+    }
 
     fun getLastUpdatedText(composeTestRule: ComposeTestRule): String {
         return composeTestRule.onNodeWithTag(TEST_TAG_LAST_UPDATED).fetchSemanticsNode()
@@ -77,7 +76,6 @@ object HomepageHelper {
             ?.firstOrNull()
             .toString()
     }
-
 
 
 }
