@@ -78,7 +78,7 @@ fun HomePage(
         )
         Spacer(Modifier.padding(bottom = 50.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("mainActivityHeader"),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -139,7 +139,7 @@ fun Subheading(currentTime: Date) {
     )
     Text(
         text = stringResource(R.string.subtitle_text),
-        modifier = Modifier.padding(horizontal = 45.dp)
+        modifier = Modifier.padding(horizontal = 45.dp).testTag("subheading")
     )
 }
 
@@ -156,7 +156,7 @@ fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { dropdownExpanded.value = true }
+            modifier = Modifier.clickable { dropdownExpanded.value = true }.testTag("dropDownMenu")
         ) {
             Text(text = topics[itemPosition])
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
