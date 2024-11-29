@@ -4,11 +4,15 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import uk.co.bbc.application.TEST_TAG_BREAKING_NEWS_BUTTON
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU_ITEM
 import uk.co.bbc.application.TEST_TAG_GO_TO_BUTTON
 import uk.co.bbc.application.TEST_TAG_LAST_UPDATED
+import uk.co.bbc.application.TEST_TAG_LOADING_SPINNER
 import uk.co.bbc.application.TEST_TAG_REFRESH_BUTTON
 import uk.co.bbc.application.utils.ComposeAssertions
 import uk.co.bbc.application.utils.ComposeActions
@@ -46,4 +50,34 @@ object HomepageHelper {
         }
         assert(actualTopics == expectedTopics)
     }
+
+    fun clickRefreshButton(composeTestRule: ComposeTestRule) {
+        val oldLastUpdated = getLastUpdatedText(composeTestRule)
+
+        runBlocking { delay(1000) }
+
+        ComposeActions.performClick(composeTestRule, TEST_TAG_REFRESH_BUTTON)
+        ComposeAssertions.isDisplayed(composeTestRule,TEST_TAG_LOADING_SPINNER)
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(3000) {
+                composeTestRule.onAllNodesWithTag(TEST_TAG_LOADING_SPINNER).fetchSemanticsNodes().isEmpty()
+        }
+        ComposeAssertions.isNotDisplayed(composeTestRule, TEST_TAG_LOADING_SPINNER)
+
+        val newLastUpdated = getLastUpdatedText(composeTestRule)
+
+        ComposeAssertions.isDateUpdated(oldLastUpdated, newLastUpdated)
+    }
+
+
+    fun getLastUpdatedText(composeTestRule: ComposeTestRule): String {
+        return composeTestRule.onNodeWithTag(TEST_TAG_LAST_UPDATED).fetchSemanticsNode()
+            .config
+            .getOrNull(SemanticsProperties.Text)
+            ?.firstOrNull()
+            .toString()
+    }
+
+
+
 }

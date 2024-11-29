@@ -31,4 +31,11 @@ class HomepageTest {
             HomepageHelper.verifyDropDownMenuItems(composeTestRule)
         }
     }
+
+    @Test
+    fun testRefreshButtonUpdatesSuccessfully() {
+        mainActivityScenario.use {
+            HomepageHelper.clickRefreshButton(composeTestRule)
+        }
+    }
 }
