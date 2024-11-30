@@ -3,15 +3,15 @@ package uk.co.bbc.application.utils
 
 import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import org.junit.Assert.assertTrue
+import uk.co.bbc.application.support.HomepageHelper.extractDate
 
 object ComposeAssertions {
 
@@ -31,18 +31,13 @@ object ComposeAssertions {
     }
 
     fun isNotDisplayed(composeTestRule: ComposeTestRule, testTag: String) {
-        composeTestRule.onNodeWithTag(testTag).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag).assertIsNotDisplayed()
     }
 
     fun isDateUpdated(oldDateString: String, newDateString: String) {
         val oldDate = extractDate(oldDateString)
         val newDate = extractDate(newDateString)
-        assert(oldDate < newDate) { "New date ($newDate) should be later than the old date ($oldDate)." }
+        assertTrue("New date ($newDate) should be later than the old date ($oldDate).",oldDate < newDate)
     }
 
-    fun extractDate(dateString: String): Date {
-        val dateFormat = SimpleDateFormat("dd MMM yyyy 'at' HH:mm:ss", Locale.ENGLISH)
-        return dateFormat.parse(dateString.substringAfter(": ").trim())
-            ?: throw IllegalArgumentException("Invalid date format")
-    }
 }

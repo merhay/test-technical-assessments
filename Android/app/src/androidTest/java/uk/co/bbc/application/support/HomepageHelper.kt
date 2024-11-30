@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import uk.co.bbc.application.TEST_TAG_BREAKING_NEWS_BUTTON
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU_ITEM
@@ -16,6 +17,9 @@ import uk.co.bbc.application.TEST_TAG_LOADING_SPINNER
 import uk.co.bbc.application.TEST_TAG_REFRESH_BUTTON
 import uk.co.bbc.application.utils.ComposeAssertions
 import uk.co.bbc.application.utils.ComposeActions
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object HomepageHelper {
 
@@ -48,7 +52,7 @@ object HomepageHelper {
         val actualTopics = nodes.map { node ->
             node.config.getOrNull(SemanticsProperties.Text)?.firstOrNull().toString()
         }
-        assert(actualTopics == expectedTopics)
+        assertEquals(expectedTopics, actualTopics)
     }
 
     fun clickRefreshButton(composeTestRule: ComposeTestRule) {
@@ -77,5 +81,10 @@ object HomepageHelper {
             .toString()
     }
 
+    fun extractDate(dateString: String): Date {
+        val dateFormat = SimpleDateFormat("dd MMM yyyy 'at' HH:mm:ss", Locale.ENGLISH)
+        return dateFormat.parse(dateString.substringAfter(": ").trim())
+            ?: throw IllegalArgumentException("Invalid date format")
+    }
 
 }
