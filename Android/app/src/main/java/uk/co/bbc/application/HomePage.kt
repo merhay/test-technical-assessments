@@ -156,7 +156,7 @@ fun PickerDropdownMenu(onClick: (String, Int) -> Unit, itemPosition: Int) {
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { dropdownExpanded.value = true }.testTag("dropDownMenu")
+            modifier = Modifier.clickable { dropdownExpanded.value = true }.testTag("dropDown")
         ) {
             Text(text = topics[itemPosition])
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)

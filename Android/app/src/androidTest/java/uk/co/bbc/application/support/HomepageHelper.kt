@@ -4,7 +4,10 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -24,7 +27,7 @@ import java.util.Locale
 object HomepageHelper {
 
     private const val mainActivityHeaderTestTag = "mainActivityHeader"
-    private const val dropDown = "dropDownMenu"
+    private const val dropDown = "dropDown"
 
     fun waitForMainActivityToLoad(composeTestRule: ComposeTestRule) {
         composeTestRule.waitForIdle()
@@ -43,6 +46,19 @@ object HomepageHelper {
         ComposeActions.performClick(composeTestRule, dropDown)
         composeTestRule.waitForIdle()
         ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_DROPDOWN_MENU)
+    }
+
+    fun clickDropDownAndSelectTopic(composeTestRule: ComposeTestRule, topic: String) {
+        clickDropDownMenu(composeTestRule)
+
+        composeTestRule.onAllNodesWithText(topic).onFirst().performClick()
+        composeTestRule.waitForIdle()
+        ComposeAssertions.isDisplayedWithText(composeTestRule, topic)
+    }
+
+    fun verifyGoToLinkUpdatesToTopic(composeTestRule: ComposeTestRule, topic: String){
+        val goToLinktext = getNodeText(composeTestRule, TEST_TAG_GO_TO_BUTTON)
+        assertEquals(goToLinktext, "Go to " +topic)
     }
 
     fun verifyDropDownMenuItems(composeTestRule: ComposeTestRule){
@@ -73,12 +89,12 @@ object HomepageHelper {
         ComposeAssertions.isNotDisplayed(composeTestRule, TEST_TAG_LOADING_SPINNER)
     }
 
-    fun getLastUpdatedText(composeTestRule: ComposeTestRule): String {
-        return composeTestRule.onNodeWithTag(TEST_TAG_LAST_UPDATED).fetchSemanticsNode()
+    fun getNodeText(composeTestRule: ComposeTestRule, testTag: String): String {
+        return composeTestRule.onNodeWithTag(testTag).fetchSemanticsNode()
             .config
             .getOrNull(SemanticsProperties.Text)
             ?.firstOrNull()
-            .toString()
+            .toString().trim()
     }
 
     fun extractDate(dateString: String): Date {

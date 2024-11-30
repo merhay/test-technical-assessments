@@ -8,7 +8,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.Before
 import uk.co.bbc.application.support.HomepageHelper
-import uk.co.bbc.application.support.HomepageHelper.getLastUpdatedText
+import uk.co.bbc.application.support.HomepageHelper.getNodeText
 
 @RunWith(AndroidJUnit4::class)
 class HomepageTest {
@@ -36,11 +36,20 @@ class HomepageTest {
     @Test
     fun testRefreshLastUpdatedSuccessfully() {
         mainActivityScenario.use {
-            val oldLastUpdated = getLastUpdatedText(composeTestRule)
+            val oldLastUpdated = getNodeText(composeTestRule, TEST_TAG_LAST_UPDATED)
             HomepageHelper.clickRefreshButton(composeTestRule)
             HomepageHelper.waitUntilLoadingSpinnerCompletes(composeTestRule)
-            val newLastUpdated = getLastUpdatedText(composeTestRule)
+            val newLastUpdated = getNodeText(composeTestRule, TEST_TAG_LAST_UPDATED)
             HomepageHelper.verifyRefreshLastUpdated(oldLastUpdated, newLastUpdated)
+        }
+    }
+
+    @Test
+    fun testGoToLinkChangesAccordingToTopicPicker() {
+        mainActivityScenario.use {
+            val topic = "Technology"
+            HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
+            HomepageHelper.verifyGoToLinkUpdatesToTopic(composeTestRule, topic)
         }
     }
 }
