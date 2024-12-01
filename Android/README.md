@@ -11,5 +11,5 @@ Automated testing of Android application using Jetpack Compose
 ### Running the tests
 - Open the project in Android Studio
 - Make sure the required android virtual or physical device is connected
-- Run the UI tests using the `Run` button in Android Studio or using the command `./gradlew connectedAndroidTest`
+- Run the UI tests using the `Run` button in Android Studio or using the command for MAC/LINUX `./gradlew connectedAndroidTest` and for WINDOWS `gradlew connectedAndroidTest`
 - View the test results in the `app/build/reports/tests/testDebugUnitTest/index.html` file
