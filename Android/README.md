@@ -9,13 +9,12 @@ Automated testing of Android application using Jetpack Compose
 - Kotlin 1.x
 - Android Virtual Device: Medium Phone API 35 or higher
 
-## Installation
+## Running the UI tests
 - Clone the repository
 - Open the Android project in Android Studio. Navigate to the project directory:
 ```bash
 cd Android
 ```
-## Running the UI tests
 - Testing requires an Android virtual or physical device to be connected
 
 ### Using Android Studio
