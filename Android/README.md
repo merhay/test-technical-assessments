@@ -15,11 +15,11 @@ Automated testing of Android application using Jetpack Compose
 ```bash
 cd Android
 ```
-## Running the tests
-- Make sure the required Android virtual or physical device is connected
+## Running the UI tests
+- Testing requires an Android virtual or physical device to be connected
 
 ### Using Android Studio
-- Run the UI tests using the `Run` button in Android Studio
+- Run the UI tests using the `Run` button in Android Studio (Requires an Android Test Run/Debug configuration)
 
 ### Using the Command Line
 - **For MacOS/Linux**: 
