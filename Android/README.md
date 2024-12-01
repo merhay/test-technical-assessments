@@ -21,15 +21,14 @@ cd Android
 ### Using Android Studio
 - Run the UI tests using the `Run` button in Android Studio
 
-### Using the command line
-- Run using the command line 
-  - **for MacOS/Linux**: 
-    ```bash
-    ./gradlew connectedAndroidTest
-    ```
-  - **for WINDOWS (Command Prompt)**:
-    ```cmd
-    gradlew.bat connectedAndroidTest
-    ```
+### Using the Command Line
+- **For MacOS/Linux**: 
+  ```bash
+  ./gradlew connectedAndroidTest
+  ```
+- **For WINDOWS (Command Prompt)**:
+  ```cmd
+  gradlew.bat connectedAndroidTest
+  ```
 ## Viewing the test results
 - View the test results in the `app/build/reports/tests/testDebugUnitTest/index.html` file
