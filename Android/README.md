@@ -7,17 +7,15 @@ Automated testing of Android application using Jetpack Compose
 - Gradle
 - Java 17 or higher
 - Kotlin 1.x
-- Android Virtual Device: Medium Phone API 35 or higher
+- Android Virtual Device (AVD): Medium Phone API 35 or higher
 
 ## Running the UI tests
 1) Clone the repository
 ```bash
 git clone https://github.com/merhay/test-technical-assessments.git
 ```
-2) Open the Android project in Android Studio. Navigate to the project directory:
-```bash
-cd Android
-```
+2) Open the **Android** project folder in Android Studio. 
+
 3) Testing requires an Android virtual or physical device to be connected:
   - For Virtual Device: Open Android Studio, navigate to Tools > Device Manager, and start or create an AVD.
   - For Physical Device: Connect via USB and enable USB Debugging in developer options.
@@ -25,7 +23,7 @@ cd Android
 4) Run the UI Tests
 
    **Option 1**: Using Android Studio
-    - Run the UI tests using the `Run` button in Android Studio (Requires an Android Test Run/Debug        configuration)
+    - Run the UI tests using the `Run` button in Android Studio (Requires an Android Test Run/Debug configuration)
     
    **Option 2**: Using the Command Line
     - **For MacOS/Linux**: 
