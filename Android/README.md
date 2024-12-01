@@ -1,6 +1,6 @@
 # Project Name
 
-Automated testing of Android application using Jetpcack Compose
+Automated testing of Android application using Jetpack Compose
 
 ### Prerequisites
 - Android Studio or IntelliJ IDEA
