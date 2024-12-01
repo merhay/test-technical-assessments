@@ -2,22 +2,30 @@ package uk.co.bbc.application.support
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import uk.co.bbc.application.TEST_TAG_ALERT_CONFIRM_BUTTON
 import uk.co.bbc.application.TEST_TAG_BREAKING_NEWS_BUTTON
+import uk.co.bbc.application.TEST_TAG_CONTENT_HEADING
+import uk.co.bbc.application.TEST_TAG_CONTENT_TEXT
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU
 import uk.co.bbc.application.TEST_TAG_DROPDOWN_MENU_ITEM
 import uk.co.bbc.application.TEST_TAG_GO_TO_BUTTON
 import uk.co.bbc.application.TEST_TAG_LAST_UPDATED
 import uk.co.bbc.application.TEST_TAG_LOADING_SPINNER
 import uk.co.bbc.application.TEST_TAG_REFRESH_BUTTON
+import uk.co.bbc.application.TEST_TAG_TOP_BAR_TITLE
 import uk.co.bbc.application.utils.ComposeAssertions
 import uk.co.bbc.application.utils.ComposeActions
 import java.text.SimpleDateFormat
@@ -32,8 +40,6 @@ object HomepageHelper {
     fun waitForMainActivityToLoad(composeTestRule: ComposeTestRule) {
         composeTestRule.waitForIdle()
         ComposeAssertions.isChildWithTextDisplayed(composeTestRule, mainActivityHeaderTestTag, "My BBC")
-
-        ComposeAssertions.isDisplayedWithText(composeTestRule, "My BBC")
         ComposeAssertions.isDisplayed(composeTestRule,TEST_TAG_REFRESH_BUTTON)
         ComposeAssertions.isDisplayed(composeTestRule,TEST_TAG_LAST_UPDATED)
         ComposeAssertions.isDisplayedWithText(composeTestRule,"This is a BBC app with all your favourite content")
@@ -42,14 +48,20 @@ object HomepageHelper {
         ComposeAssertions.isDisplayed(composeTestRule,TEST_TAG_BREAKING_NEWS_BUTTON)
     }
 
-    fun clickDropDownMenu(composeTestRule: ComposeTestRule) {
+    fun verifyUserIsOnHomepage(composeTestRule: ComposeTestRule) {
+        composeTestRule.waitForIdle()
+        ComposeAssertions.isDisplayedWithText(composeTestRule, "My BBC")
+        ComposeAssertions.isDisplayedWithText(composeTestRule,"This is a BBC app with all your favourite content")
+    }
+
+    fun clickDropdownMenu(composeTestRule: ComposeTestRule) {
         ComposeActions.performClick(composeTestRule, dropDown)
         composeTestRule.waitForIdle()
         ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_DROPDOWN_MENU)
     }
 
     fun clickDropDownAndSelectTopic(composeTestRule: ComposeTestRule, topic: String) {
-        clickDropDownMenu(composeTestRule)
+        clickDropdownMenu(composeTestRule)
 
         composeTestRule.onAllNodesWithText(topic).onFirst().performClick()
         composeTestRule.waitForIdle()
@@ -101,6 +113,38 @@ object HomepageHelper {
         val dateFormat = SimpleDateFormat("dd MMM yyyy 'at' HH:mm:ss", Locale.ENGLISH)
         return dateFormat.parse(dateString.substringAfter(": ").trim())
             ?: throw IllegalArgumentException("Invalid date format")
+    }
+
+    fun verifyUserLandsOnContentPage(composeTestRule: ComposeTestRule, topic: String) {
+        ComposeAssertions.isChildWithTextDisplayed(composeTestRule, TEST_TAG_TOP_BAR_TITLE, topic)
+        ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_CONTENT_HEADING)
+        ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_CONTENT_TEXT)
+    }
+
+    fun verifyScrollToTheEnd(composeTestRule: ComposeTestRule, text: String, scrollableTag: String) {
+        val max = 2
+        var counter = 0
+
+        while (counter < max) {
+            try {
+                composeTestRule.onNodeWithText(text).assertIsDisplayed()
+
+            } catch (e: AssertionError) {
+                composeTestRule.onNodeWithTag(scrollableTag).performTouchInput { swipeUp() }
+                counter++
+            }
+        }
+    }
+
+    fun verifyTvLicenseAlertDialogue(composeTestRule: ComposeTestRule) {
+        ComposeAssertions.isDisplayedWithText(composeTestRule, "Do you have a TV License ?")
+        ComposeAssertions.isDisplayedWithText(composeTestRule, "Yes")
+        ComposeAssertions.isDisplayedWithText(composeTestRule, "No")
+    }
+
+    fun verifySomethingWrongAlertDialogue(composeTestRule: ComposeTestRule) {
+        ComposeAssertions.isDisplayedWithText(composeTestRule, "Something has gone wrong")
+        ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_ALERT_CONFIRM_BUTTON)
     }
 
 }

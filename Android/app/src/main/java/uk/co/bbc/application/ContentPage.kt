@@ -26,6 +26,10 @@ import androidx.compose.ui.unit.dp
 import uk.co.bbc.application.ui.theme.ApplicationTheme
 
 const val TEST_TAG_BACK_BUTTON = "back button"
+const val TEST_TAG_TOP_BAR_TITLE = "top app bar title"
+const val TEST_TAG_CONTENT_HEADING = "content page heading"
+const val TEST_TAG_CONTENT_TEXT = "content page text"
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +44,7 @@ fun ContentPage(onHomeClick: () -> Unit, title: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            TopAppBar(title = { Text(text = title) }, navigationIcon = {
+            TopAppBar(title = { Text(text = title) }, modifier = Modifier.testTag(TEST_TAG_TOP_BAR_TITLE), navigationIcon = {
                 IconButton(modifier = Modifier.testTag(TEST_TAG_BACK_BUTTON), onClick = { onHomeClick() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -57,9 +61,10 @@ fun ContentPage(onHomeClick: () -> Unit, title: String) {
                 verticalArrangement = Arrangement.Top
             ) {
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
-                Text(text = title)
+                Text(text = title, modifier = Modifier.testTag(TEST_TAG_CONTENT_HEADING))
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
-                Text(text = stringResource(R.string.lorem_Placeholder_Text))
+                Text(text = stringResource(R.string.lorem_Placeholder_Text), modifier = Modifier.testTag(
+                    TEST_TAG_CONTENT_TEXT))
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
             }
 

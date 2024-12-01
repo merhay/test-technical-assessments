@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import org.junit.Before
 import uk.co.bbc.application.support.HomepageHelper
 import uk.co.bbc.application.support.HomepageHelper.getNodeText
+import uk.co.bbc.application.utils.ComposeActions
 
 @RunWith(AndroidJUnit4::class)
 class HomepageTest {
@@ -28,13 +29,13 @@ class HomepageTest {
         mainActivityScenario.use {
             // Add your test code here
             HomepageHelper.waitForMainActivityToLoad(composeTestRule)
-            HomepageHelper.clickDropDownMenu(composeTestRule)
+            HomepageHelper.clickDropdownMenu(composeTestRule)
             HomepageHelper.verifyDropDownMenuItems(composeTestRule)
         }
     }
 
     @Test
-    fun testRefreshLastUpdatedSuccessfully() {
+    fun refreshesLastUpdated() {
         mainActivityScenario.use {
             val oldLastUpdated = getNodeText(composeTestRule, TEST_TAG_LAST_UPDATED)
             HomepageHelper.clickRefreshButton(composeTestRule)
@@ -45,11 +46,61 @@ class HomepageTest {
     }
 
     @Test
-    fun testGoToLinkChangesAccordingToTopicPicker() {
+    fun updatesGoToLinkOnTopicPicker() {
         mainActivityScenario.use {
             val topic = "Technology"
             HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
             HomepageHelper.verifyGoToLinkUpdatesToTopic(composeTestRule, topic)
         }
     }
+
+    @Test
+    fun navigatesToContentPageOnGoToLinkClick() {
+        mainActivityScenario.use {
+            val topic = "Technology"
+            HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_GO_TO_BUTTON)
+            HomepageHelper.verifyUserLandsOnContentPage(composeTestRule, topic)
+            HomepageHelper.verifyScrollToTheEnd(composeTestRule,"bla bla", TEST_TAG_CONTENT_TEXT)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_BACK_BUTTON)
+            HomepageHelper.verifyUserIsOnHomepage(composeTestRule)
+        }
+    }
+
+    @Test
+    fun showsAlertForNoTvLicence() {
+        mainActivityScenario.use {
+            val topic = "TV Guide"
+            HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_GO_TO_BUTTON)
+            HomepageHelper.verifyTvLicenseAlertDialogue(composeTestRule)
+            ComposeActions.performClickWithText(composeTestRule, "No")
+            HomepageHelper.verifyUserIsOnHomepage(composeTestRule)
+        }
+    }
+
+    @Test
+    fun navigatesToContentPageForUserWithTvLicense() {
+        mainActivityScenario.use {
+            val topic = "TV Guide"
+            HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_GO_TO_BUTTON)
+            HomepageHelper.verifyTvLicenseAlertDialogue(composeTestRule)
+            ComposeActions.performClickWithText(composeTestRule, "Yes")
+            HomepageHelper.verifyUserLandsOnContentPage(composeTestRule, topic)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_BACK_BUTTON)
+            HomepageHelper.verifyUserIsOnHomepage(composeTestRule)
+        }
+    }
+
+    @Test
+    fun breakingNewsShowsErrorAlert() {
+        mainActivityScenario.use {
+            ComposeActions.performClick(composeTestRule, TEST_TAG_BREAKING_NEWS_BUTTON)
+            HomepageHelper.verifySomethingWrongAlertDialogue(composeTestRule)
+            ComposeActions.performClick(composeTestRule, TEST_TAG_ALERT_CONFIRM_BUTTON)
+            HomepageHelper.verifyUserIsOnHomepage(composeTestRule)
+        }
+    }
+
 }
