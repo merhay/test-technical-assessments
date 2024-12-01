@@ -25,7 +25,7 @@ class HomepageTest {
     }
 
     @Test
-    fun testHomePageLoadsSuccessfully() {
+    fun loadsHomepageSuccessfully() {
         mainActivityScenario.use {
             // Add your test code here
             HomepageHelper.waitForMainActivityToLoad(composeTestRule)
