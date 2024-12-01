@@ -32,13 +32,14 @@ git clone https://github.com/merhay/test-technical-assessments.git
    **Option 2**: Using the Command Line
 
    Note: make sure you are in "Android" directory before running the commands
-    - **For MacOS/Linux**:
-    ```bash
-    ./gradlew connectedAndroidTest
-    ```
-    - **For Windows (Command Prompt)**:
-    ```cmd
-    gradlew.bat connectedAndroidTest
-    ```
+    
+  - For MacOS/Linux:
+  ```bash
+  ./gradlew connectedAndroidTest
+  ```
+  - **For Windows (Command Prompt)**:
+  ```cmd
+  gradlew.bat connectedAndroidTest
+  ```
 ## Viewing the test results
 - View the test results in the `app/build/reports/tests/testDebugUnitTest/index.html` file
