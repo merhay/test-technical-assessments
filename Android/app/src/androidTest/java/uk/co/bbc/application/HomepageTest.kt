@@ -27,7 +27,6 @@ class HomepageTest {
     @Test
     fun loadsHomepageSuccessfully() {
         mainActivityScenario.use {
-            // Add your test code here
             HomepageHelper.waitForMainActivityToLoad(composeTestRule)
             HomepageHelper.clickDropdownMenu(composeTestRule)
             HomepageHelper.verifyDropDownMenuItems(composeTestRule)
@@ -61,7 +60,7 @@ class HomepageTest {
             HomepageHelper.clickDropDownAndSelectTopic(composeTestRule, topic)
             ComposeActions.performClick(composeTestRule, TEST_TAG_GO_TO_BUTTON)
             HomepageHelper.verifyUserLandsOnContentPage(composeTestRule, topic)
-            HomepageHelper.verifyScrollToTheEnd(composeTestRule,"bla bla", TEST_TAG_CONTENT_TEXT)
+            HomepageHelper.verifyScrollToTheEnd(composeTestRule, TEST_TAG_CONTENT_END)
             ComposeActions.performClick(composeTestRule, TEST_TAG_BACK_BUTTON)
             HomepageHelper.verifyUserIsOnHomepage(composeTestRule)
         }

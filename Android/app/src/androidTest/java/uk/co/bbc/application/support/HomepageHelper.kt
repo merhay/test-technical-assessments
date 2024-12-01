@@ -2,16 +2,12 @@ package uk.co.bbc.application.support
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeUp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -121,19 +117,9 @@ object HomepageHelper {
         ComposeAssertions.isDisplayed(composeTestRule, TEST_TAG_CONTENT_TEXT)
     }
 
-    fun verifyScrollToTheEnd(composeTestRule: ComposeTestRule, text: String, scrollableTag: String) {
-        val max = 2
-        var counter = 0
-
-        while (counter < max) {
-            try {
-                composeTestRule.onNodeWithText(text).assertIsDisplayed()
-
-            } catch (e: AssertionError) {
-                composeTestRule.onNodeWithTag(scrollableTag).performTouchInput { swipeUp() }
-                counter++
-            }
-        }
+    fun verifyScrollToTheEnd(composeTestRule: ComposeTestRule, tag: String) {
+        ComposeActions.scrollTo(composeTestRule, tag)
+        ComposeAssertions.isDisplayed(composeTestRule, tag)
     }
 
     fun verifyTvLicenseAlertDialogue(composeTestRule: ComposeTestRule) {

@@ -29,6 +29,7 @@ const val TEST_TAG_BACK_BUTTON = "back button"
 const val TEST_TAG_TOP_BAR_TITLE = "top app bar title"
 const val TEST_TAG_CONTENT_HEADING = "content page heading"
 const val TEST_TAG_CONTENT_TEXT = "content page text"
+const val TEST_TAG_CONTENT_END = "content page end"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,8 +63,10 @@ fun ContentPage(onHomeClick: () -> Unit, title: String) {
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
                 Text(text = title, modifier = Modifier.testTag(TEST_TAG_CONTENT_HEADING))
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
-                Text(text = stringResource(R.string.lorem_Placeholder_Text), modifier = Modifier.testTag(
+                Text(text = stringResource(R.string.lorem_Placeholder_Text).substringBeforeLast("\n"), modifier = Modifier.testTag(
                     TEST_TAG_CONTENT_TEXT))
+                Text(text = stringResource(R.string.lorem_Placeholder_Text).substringAfterLast("\n"), modifier = Modifier.testTag(
+                    TEST_TAG_CONTENT_END))
                 Spacer(modifier = Modifier.padding(bottom = 30.dp))
             }
 
