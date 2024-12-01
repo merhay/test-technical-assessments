@@ -26,7 +26,9 @@ git clone https://github.com/merhay/test-technical-assessments.git
     - Run the UI tests using the `Run` button in Android Studio (Requires an Android Test Run/Debug configuration)
     
    **Option 2**: Using the Command Line
-    - **For MacOS/Linux**: 
+
+   Note: make sure you are in "Android" directory before running the commands
+    - **For MacOS/Linux**:
     ```bash
     ./gradlew connectedAndroidTest
     ```
