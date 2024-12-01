@@ -30,7 +30,6 @@ const val TEST_TAG_TOP_BAR_TITLE = "top app bar title"
 const val TEST_TAG_CONTENT_HEADING = "content page heading"
 const val TEST_TAG_CONTENT_TEXT = "content page text"
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContentPage(onHomeClick: () -> Unit, title: String) {
